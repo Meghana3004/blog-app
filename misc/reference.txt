@@ -1,0 +1,101 @@
+  // Function to append data to Excel file
+  function appendToExcel(data) {
+    try {
+        const excelFile = path.join(__dirname, 'postData.xlsx');
+        const workbook = xlsx.readFile(excelFile);
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = xlsx.utils.sheet_to_json(sheet);
+  
+        // Add new data to existing JSON data
+        jsonData.push(data);
+  
+        // Convert updated JSON data back to Excel format
+        const newSheet = xlsx.utils.json_to_sheet(jsonData);
+        const newWorkbook = xlsx.utils.book_new();
+        xlsx.utils.book_append_sheet(newWorkbook, newSheet, sheetName);
+  
+        // Write updated Excel file
+        xlsx.writeFile(newWorkbook, excelFile);
+        console.log('Data appended to Excel file successfully.');
+    } catch (error) {
+        console.error('Error appending data to Excel file:', error);
+    }
+  }
+
+
+
+  //route to fetch all posts from excel
+  app.get('/blog', (req, res) => {
+    try {
+        // Construct the absolute path to the Excel file
+        const excelFile = path.join(__dirname, 'postData.xlsx');
+        
+        // Read the Excel file and send the data to the client
+        const workbook = xlsx.readFile(excelFile);
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = xlsx.utils.sheet_to_json(sheet);
+
+        // Send the JSON data to the client
+        res.json(jsonData);
+    } catch (error) {
+        console.error('Error reading Excel file:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+// Route to handle post requests for creating new blog posts
+app.post('/newpost', (req, res) => {
+  try {
+      const { title, content } = req.body;
+
+      // Append form data to Excel file
+      const postData = { Title: title, Content: content };
+      appendToExcel(postData);
+
+      res.status(200).json({ message: 'Blog post created successfully.' });
+      
+  } catch (error) {
+      console.error('Error creating new blog post:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+ app.get('/posts-all', (req, res) => {
+   const query = 'CALL FetchAllPosts';
+
+   db.query(query, (err, results) => {
+     if (err) throw err;
+
+     res.json(results);
+   });
+ });
+
+
+ app.get('/api/data', (req, res) => {
+   const FetchList = 'CALL FetchList()'; 
+   db.query(FetchList, (err, results) => {
+     if (err) {
+       console.error('Error fetching data:', err);
+       res.status(500).json({ message: 'Error fetching data' });
+     } else {
+       res.status(200).json(results[0]); 
+     }
+   });
+ });
+
+
+ app.get('/textfile', (req, res) => {
+   try {
+       const textFilePath = path.join(__dirname, 'chatbot_doc.txt'); 
+       const text = fs.readFileSync(textFilePath, 'utf8');
+       res.send(text);
+   } catch (error) {
+       console.error('Error reading text file:', error);
+       res.status(500).json({ error: 'Internal Server Error' });
+   }
+ });

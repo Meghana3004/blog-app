@@ -1,0 +1,50 @@
+
+.post-content-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    width: 60% !important;
+    margin-top: 80px;
+    border-radius: 5px;
+    margin-bottom: 50px;
+  }
+  
+  .post-title {
+    font-size: 2.5em;
+    color: #008A16;
+    font-family: 'Georgia', serif;
+  }
+  
+  .post-subtitle {
+    font-size: 1.2em;
+    color: #666;
+  }
+  
+
+  .post-content-card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .post-content {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    padding: 15px;
+  }
+  
+.comments{
+    width: 60% !important;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+  }

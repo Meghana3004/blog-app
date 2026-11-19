@@ -1,0 +1,89 @@
+.mission{
+    height: 650px !important;
+    padding: 2rem;
+    justify-content: center;
+    background-color: #3DCD58 !important;
+}
+
+hr.divider {
+    height: 0.2rem;
+    max-width: 3.25rem;
+    margin: 1.5rem auto;
+    opacity: 1;
+  }
+  
+  hr.divider-light {
+    background-color: #ffffff;
+  }
+
+  hr.divider-green{
+    background-color: #008A16;
+    border-top: #008A16;
+  }
+
+  .btn-green{
+    background-color: #3DCD58 !important;
+    color: #ffffff;
+    border: #3DCD58 !important;
+  }
+
+  .btn-xl {
+    padding: 1.25rem 2.25rem !important;
+    font-size: 20px !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 10rem !important;
+    margin: 30px;
+  }
+  
+  .text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-size: large;
+    
+  }
+
+  .page-section {
+    padding: 8rem 0;
+  }
+
+  .icon{
+    color: #008A16;
+    font-size: 75px !important;
+  }
+
+.text{
+    font-size: large !important;
+}
+
+.footer {
+    background-color: #323232;
+  }
+  
+.footer p {
+    color:rgba(255, 255, 255, 0.55);
+}
+  
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .footer-links a {
+    margin-right: 15px;
+  }
+  
+  .newsletter-section {
+    background-color: #F3F2F2;
+    padding: 4rem 0;
+  }
+  
+  .newsletter-form-container {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  .newsletter-input {
+    font-size: 0.9rem;
+  }

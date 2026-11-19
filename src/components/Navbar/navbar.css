@@ -1,0 +1,14 @@
+.profile-icon{
+    background-color: #008A16;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-weight: 600;
+    padding: 8px;
+    padding-left: 14px; 
+    color: #ffffff;
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}

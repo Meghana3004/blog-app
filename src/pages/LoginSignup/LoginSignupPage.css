@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #F3F2F2;
+    margin: 0;
+    padding: 0;
+}
+
+.main-login {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F3F2F2;
+}
+
+.text-white-75 {
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-size: larger;
+}
+
+.btn-green {
+    background-color: #3DCD58 !important;
+    color: #ffffff !important;
+    border: none !important;
+    transition: background-color 0.3s;
+}
+
+.btn-green:hover {
+    background-color: #008A16 !important;
+}
+
+.header {
+    font-size: 35px;
+    font-weight: bold;
+    color: #323232;
+    margin-bottom: 20px;
+}
+
+.example {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.nav-tabs .nav-link {
+    color: #323232;
+    font-weight: bold;
+    margin-right: 5px;
+    transition: color 0.3s;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #3DCD58;
+}
+
+.nav-tabs .nav-link.active {
+    color: #3DCD58;
+    border-color: #3DCD58;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.control {
+    padding: 15px !important;
+    border-radius: 5px !important;
+    border: 1px solid #ccc !important;
+    font-size: 16px !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.alert {
+    font-size: 14px;
+}
