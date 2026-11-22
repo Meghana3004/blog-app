@@ -1,27 +1,28 @@
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-const db = require('./db');
-
 const routes = require('./routes/routes');
 
+app.use('/', routes);
 app.use('/api', routes);
 
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
+  });
+}
 
-// module.exports = app;
-
-
+module.exports = app;
 

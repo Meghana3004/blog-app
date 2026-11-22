@@ -2,6 +2,27 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Local PostgreSQL setup
+
+The original files in `dumps/Dump20240724` are MySQL exports. Use the converted
+[`postgres_import.sql`](./dumps/Dump20240724/postgres_import.sql) script with a
+new, empty PostgreSQL database; the script creates the tables and imports the
+dumped data.
+
+1. Install PostgreSQL and create a database named `POCDB1` in DBeaver.
+2. Add the PostgreSQL settings shown in `.env.example` to `.env` (keep its
+   existing `PORT` setting) and set them to match your local connection. Keep
+   `.env` private.
+3. In DBeaver, connect to `POCDB1`, open `dumps/Dump20240724/postgres_import.sql`
+   in the SQL Editor, and execute the whole script once.
+4. Run `npm install`, then start the API with `npm run dev`.
+5. To run the React UI, start `npm start` in a second terminal. Its API requests
+   are proxied to the backend on port `3001` (change the `proxy` setting in
+   `package.json` if you use a different backend port).
+
+The converted PostgreSQL API uses ordinary parameterized queries; the original
+MySQL procedures are not required.
+
 ## Available Scripts
 
 In the project directory, you can run:
