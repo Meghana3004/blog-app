@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import './Comments.css';
 import { TextField, IconButton, Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Comments = ({ postId }) => {
 
@@ -12,6 +13,7 @@ const Comments = ({ postId }) => {
   const [replyText, setReplyText] = useState(''); 
   const [activeComment, setActiveComment] = useState(null); 
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -46,9 +48,7 @@ const Comments = ({ postId }) => {
     event.preventDefault();
 
     if (commentText.trim() !== '') {
-      const username = sessionStorage.getItem('username');
-
-      if (!username) {
+      if (!user) {
         setError('Not logged in');
         return;
       }
@@ -56,7 +56,6 @@ const Comments = ({ postId }) => {
       const data = {
         post_id: postId,
         content: commentText,
-        username, 
       };
 
       try {
@@ -69,7 +68,7 @@ const Comments = ({ postId }) => {
           const newComment = {
             id: response.data.comment_id,
             text: commentText,
-            username,
+            username: response.data.username,
             timestamp: format(new Date(), "MMM dd, yyyy 'at' HH:mm"),
             replies: [],
           };
@@ -89,9 +88,7 @@ const Comments = ({ postId }) => {
     event.preventDefault();
 
     if (replyText.trim() !== '') {
-      const username = sessionStorage.getItem('username'); 
-
-      if (!username) {
+      if (!user) {
         setError('Not logged in');
         return;
       }
@@ -99,7 +96,6 @@ const Comments = ({ postId }) => {
       const data = {
         comment_id: commentId,
         content: replyText,
-        username, 
       };
 
       try {
@@ -112,7 +108,7 @@ const Comments = ({ postId }) => {
           const newReply = {
             id: response.data.reply_id,
             text: replyText,
-            username,
+            username: response.data.username,
             timestamp: format(new Date(), "MMM dd, yyyy 'at' HH:mm"),
           };
 

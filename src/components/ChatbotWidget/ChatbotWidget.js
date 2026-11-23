@@ -11,30 +11,28 @@ import './ChatbotWidget.css';
 
 const ChatbotWidget = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const [, setRefreshChatbot] = useState(false);
   const [chatbotKey, setChatbotKey] = useState(0);
 
   const toggleChatbot = () => {
     setIsChatbotOpen((prev) => !prev);
   };
   
-  const saveMessages = (messages, HTMLString) => {
-    localStorage.setItem('chat_messages', JSON.stringify(messages));
+  const saveMessages = (messages) => {
+    localStorage.setItem('blog_chat_messages', JSON.stringify(messages));
   };
 
   const loadMessages = () => {
-    const messages = JSON.parse(localStorage.getItem('chat_messages'));
-    return messages;
+    try {
+      const messages = JSON.parse(localStorage.getItem('blog_chat_messages'));
+      return Array.isArray(messages) ? messages : null;
+    } catch (error) {
+      console.error('Unable to load saved chat messages:', error);
+      return null;
+    }
   };
 
   const refreshChat = () => {
-    try{
-    localStorage.clear();
-    console.log('Local storage cleared!');
-    setRefreshChatbot(prev => !prev);
-    } catch (error) {
-      console.error('Error clearing local storage');
-    }
+    localStorage.removeItem('blog_chat_messages');
     setChatbotKey(prev => prev + 1);
   };
 
@@ -47,19 +45,19 @@ const ChatbotWidget = () => {
 
         {/* Chatbot Widget */}
         {isChatbotOpen && (
-          <Chatbot 
+          <Chatbot
             config={{
               ...config,
               customComponents: {
                 ...config.customComponents,
-                header: (props) => <config.customComponents.header {...props} refreshChat={refreshChat} />, 
+                header: (props) => <config.customComponents.header {...props} refreshChat={refreshChat} />,
               },
             }}
             messageHistory={loadMessages()}
             messageParser={MessageParser}
             actionProvider={ActionProvider}
             saveMessages={saveMessages}
-            key = {chatbotKey}
+            key={chatbotKey}
           />
         )}
       </div>

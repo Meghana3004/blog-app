@@ -1,91 +1,81 @@
-# Getting Started with Create React App
+# Infinite Horizons
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack blog application with authenticated post management, taxonomy filters,
+image uploads, and a retrieval-augmented assistant grounded in published posts.
 
-## Local PostgreSQL setup
+## Features
 
-The original files in `dumps/Dump20240724` are MySQL exports. Use the converted
-[`postgres_import.sql`](./dumps/Dump20240724/postgres_import.sql) script with a
-new, empty PostgreSQL database; the script creates the tables and imports the
-dumped data.
+- React UI with rich-text posts, profiles, comments, replies, likes, search, and pagination.
+- PostgreSQL API with password hashing, PostgreSQL-backed sessions, and owner-only post edits/deletes.
+- Category and tag filtering with server-side pagination and search.
+- Local image uploads (JPEG, PNG, GIF, or WebP; maximum 5 MB per file).
+- Local RAG assistant using Ollama chat and embedding models, PostgreSQL `pgvector` cosine similarity, and cited post sources.
+- Deterministic rule-based responses for greetings and assistant help.
 
-1. Install PostgreSQL and create a database named `POCDB1` in DBeaver.
-2. Add the PostgreSQL settings shown in `.env.example` to `.env` (keep its
-   existing `PORT` setting) and set them to match your local connection. Keep
-   `.env` private.
-3. In DBeaver, connect to `POCDB1`, open `dumps/Dump20240724/postgres_import.sql`
-   in the SQL Editor, and execute the whole script once.
-4. Run `npm install`, then start the API with `npm run dev`.
-5. To run the React UI, start `npm start` in a second terminal. Its API requests
-   are proxied to the backend on port `3001` (change the `proxy` setting in
-   `package.json` if you use a different backend port).
+## Local setup
 
-The converted PostgreSQL API uses ordinary parameterized queries; the original
-MySQL procedures are not required.
+Requirements: Node.js 20+, PostgreSQL with pgvector, and Ollama for local AI inference.
 
-## Available Scripts
+1. Copy `.env.example` to `.env`, or merge its settings into your existing `.env`. Never commit `.env`.
+2. Set `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, and `PGPASSWORD` to match your local PostgreSQL server. The examples use port `5433`; keep `PORT=3000` and `API_PORT=3001`.
+3. Ensure pgvector is installed on that PostgreSQL server and start PostgreSQL. On a new, empty database only, run `dumps/Dump20240724/postgres_import.sql` once to create the legacy tables and import demo posts.
 
-In the project directory, you can run:
+4. Apply the application schema:
 
-### `npm start`
+   ```powershell
+   npm install
+   npm run db:migrate
+   ```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+   The local-model migration changes the embedding column to 768 dimensions and removes only old, incompatible embedding vectors. It does not delete posts, users, comments, or other blog data.
+5. Install Ollama for Windows, then download the 2024-era chat and embedding models:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+   ```powershell
+   ollama pull gemma:2b
+   ollama pull nomic-embed-text
+   ```
 
-### `npm test`
+6. Rebuild embeddings for existing posts:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```powershell
+   npm run ai:reindex
+   ```
 
-### `npm run build`
+   Ollama must be running locally. New and edited posts are queued for background indexing while the API is running. The basic greeting/help responses do not need Ollama.
+7. Start the API and UI together:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   ```powershell
+   npm run dev:all
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   Open the frontend URL printed by Create React App, normally `http://localhost:3000`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Docker Compose is optional if you prefer the bundled pgvector database. The import script is for a new empty database; do not run it over existing tables or data. Imported legacy accounts have no password hashes, so register a new account to use the password-based login.
 
-### `npm run eject`
+In development, an unset `SESSION_SECRET` is replaced with an ephemeral secret and a
+warning. Set a long random `SESSION_SECRET` in production. Generate one with:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```powershell
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Uploaded files are stored in the local `uploads/` directory, which is ignored by Git.
+Use durable object storage before deploying to an ephemeral filesystem.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Tests and build
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```powershell
+npm test -- --watchAll=false
+npm run test:api
+npm run build
+```
 
-## Learn More
+## Resume draft
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Use these claims only after the database setup and an end-to-end demo have been verified:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Built a full-stack React/Node.js blog with PostgreSQL-backed sessions, password hashing,
+  owner-scoped post CRUD, comments, replies, likes, uploads, category/tag filters, and
+  server-side search/pagination.
+- Implemented a local-model RAG blog assistant with asynchronous Ollama embedding jobs,
+  PostgreSQL pgvector cosine retrieval, grounded answers, and source citations.

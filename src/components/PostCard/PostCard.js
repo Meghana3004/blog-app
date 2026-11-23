@@ -16,6 +16,12 @@ const PostCard = ({ post, toggleContent }) => {
         <Card.Subtitle className="mb-2 text-muted">
           {formattedDate} at {formattedTime} by {post.username}
         </Card.Subtitle>
+        {(post.category || post.tags?.length > 0) && (
+          <div className="mb-2 text-muted">
+            {post.category && <span className="me-2">Category: {post.category}</span>}
+            {post.tags?.length > 0 && <span>Tags: {post.tags.join(', ')}</span>}
+          </div>
+        )}
         <Card.Img className="image" variant="top" src={post.image} />
         <Card.Text className="post-content">
           <div dangerouslySetInnerHTML={{ __html: formattedText }} />

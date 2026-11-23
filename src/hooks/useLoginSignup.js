@@ -1,25 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { validateForm } from '../utils/authUtils';
+import { useAuth } from '../contexts/AuthContext';
 
 export const useLoginSignup = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const logout = queryParams.get('logout');
-
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (logout) {
-      sessionStorage.removeItem('username');
-      setSuccessMsg('Successfully logged out.');
-      setErrorMsg('');
-    }
-  }, [logout]);
+  const { setUser } = useAuth();
 
   const toggleForm = () => {
     setErrorMsg('');
@@ -27,14 +17,14 @@ export const useLoginSignup = () => {
     setIsLogin(prevState => !prevState);
   };
 
-  const handleLogin = async (email) => {
+  const handleLogin = async (email, password) => {
     try {
-      const response = await axios.post('/users/login', { email });
+      const response = await axios.post('/users/login', { email, password });
       setSuccessMsg('Successfully logged in');
-      sessionStorage.setItem('username', response.data.username);
+      setUser(response.data.user);
       navigate('/Home');
     } catch (error) {
-      setErrorMsg(error.response.data.message);
+      setErrorMsg(error.response?.data?.message || 'Unable to log in. Please try again.');
     }
   };
 
@@ -44,11 +34,13 @@ export const useLoginSignup = () => {
       setErrorMsg(error);
     } else {
       try {
-        await axios.post('/users/signup', formData);
+        const response = await axios.post('/users/signup', formData);
         setSuccessMsg('Successfully signed up');
         setErrorMsg('');
+        setUser(response.data.user);
+        navigate('/Home');
       } catch (error) {
-        setErrorMsg('Error signing up. Please try again');
+        setErrorMsg(error.response?.data?.message || 'Unable to sign up. Please try again.');
       }
     }
   };
@@ -57,7 +49,8 @@ export const useLoginSignup = () => {
     e.preventDefault();
     if (isLogin) {
       const email = e.target.elements.logEmail.value;
-      handleLogin(email);
+      const password = e.target.elements.logPassword.value;
+      handleLogin(email, password);
     } else {
       const formData = {
         name: e.target.elements.name.value,
@@ -65,6 +58,8 @@ export const useLoginSignup = () => {
         username: e.target.elements.username.value,
         dob: e.target.elements.dob.value,
         mobile: e.target.elements.mobile.value,
+        password: e.target.elements.password.value,
+        confirmPassword: e.target.elements.confirmPassword.value,
       };
       handleSignup(formData);
     }

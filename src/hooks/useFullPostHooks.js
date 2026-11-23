@@ -20,8 +20,8 @@ export const usePrevNextPosts = (postId) => {
           setPrevPostId(prevPostId);
           setNextPostId(nextPostId);
           setDisableButtons({
-            prevDisabled: !nextPostId,
-            nextDisabled: !prevPostId,
+            prevDisabled: !prevPostId,
+            nextDisabled: !nextPostId,
           });
         }
       } catch (err) {

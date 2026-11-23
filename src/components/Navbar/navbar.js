@@ -5,16 +5,26 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../../contexts/AuthContext';
 import './navbar.css';
 
 function NavbarExample() {
-  
   const navigate = useNavigate();
-  const username = sessionStorage.getItem('username'); 
+  const { user, setUser } = useAuth();
+  const username = user?.username;
 
-  const handleLogout = () => {
-    navigate('/Login?logout=true');
-  }
+  const handleLogout = async () => {
+    try {
+      await axios.post('/users/logout');
+      setUser(null);
+      localStorage.removeItem('blog_chat_messages');
+      navigate('/Login');
+    } catch (error) {
+      console.error('Unable to log out:', error);
+      window.alert('Unable to log out. Please try again.');
+    }
+  };
 
   const handleContactClick = () => {
     const currentPath = window.location.pathname;

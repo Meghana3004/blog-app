@@ -12,6 +12,12 @@ const SignupForm = ({ onSubmit }) => (
       <input type="text" className="form-control control" id="username" placeholder="Enter your username" required />
     </div>
     <div className="mb-3">
+      <input type="password" className="form-control control" id="password" placeholder="Password (at least 12 characters)" autoComplete="new-password" minLength={12} required />
+    </div>
+    <div className="mb-3">
+      <input type="password" className="form-control control" id="confirmPassword" placeholder="Confirm password" autoComplete="new-password" minLength={12} required />
+    </div>
+    <div className="mb-3">
       <label htmlFor="dob" className="form-label">Date of Birth:</label>
       <input type="date" className="form-control control" id="dob" required />
     </div>

@@ -1,6 +1,7 @@
-import React, { lazy, Suspense } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import axios from 'axios';
 import './FullPostPage.css'; 
 import LikeDislike from '../../components/LikeDislike/LikeDislike.js';
 import { usePrevNextPosts, useFormattedPostData } from '../../hooks/useFullPostHooks';
@@ -9,18 +10,50 @@ import { fetchPostData } from '../../utils/fetchPostData.js';
 const Comments = lazy(() => import('../../components/Comments/Comments.js'));
 
 const FullPostPage = () => {
-  const location = useLocation();
-  const post = location.state;
+  const { index } = useParams();
   const navigate = useNavigate();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const { prevPostId, nextPostId, disableButtons } = usePrevNextPosts(post?.post_id);
   const { formattedDate, formattedText, postTime } = useFormattedPostData(post);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError('');
+    axios.get(`/posts/${index}`)
+      .then((response) => {
+        if (active) setPost(response.data);
+      })
+      .catch((requestError) => {
+        if (active) {
+          setError(requestError.response?.data?.message || 'Unable to load this post.');
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [index]);
 
   const back = () => {
     navigate('/AllPosts');
   };
 
   const handleNext = async () => {
+    if (nextPostId) {
+      const postData = await fetchPostData(nextPostId);
+      if (postData) {
+        navigate(`/${nextPostId}`, { state: postData });
+      }
+    }
+  };
+
+  const handlePrevious = async () => {
     if (prevPostId) {
       const postData = await fetchPostData(prevPostId);
       if (postData) {
@@ -29,14 +62,12 @@ const FullPostPage = () => {
     }
   };
 
-  const handlePrevious = async () => {
-    if (nextPostId) {
-      const postData = await fetchPostData(nextPostId);
-      if (postData) {
-        navigate(`/${nextPostId}`, { state: postData });
-      }
-    }
-  };
+  if (loading) {
+    return <p role="status">Loading post...</p>;
+  }
+  if (error || !post) {
+    return <p role="alert">{error || 'Post not found.'}</p>;
+  }
 
   return (
     <>
@@ -65,7 +96,7 @@ const FullPostPage = () => {
                 <p>Posted by {post.username} at {postTime}</p>
               </div>
               <div>
-                <LikeDislike postId={post.post_id} username={sessionStorage.getItem('username')} />
+                <LikeDislike postId={post.post_id} />
               </div>
             </div>
           </Col>

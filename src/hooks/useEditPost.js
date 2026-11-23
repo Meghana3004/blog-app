@@ -6,25 +6,26 @@ import axios from 'axios';
 export const useEditPost = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const post = location.state || {};
+  const post = location.state;
+  const id = post?.post_id;
 
   const [title, setTitle] = useState(post?.title || '');
   const [image, setImage] = useState(post?.image || '');
+  const [category, setCategory] = useState(post?.category || '');
+  const [tags, setTags] = useState(Array.isArray(post?.tags) ? post.tags.join(', ') : '');
   const [editorState, setEditorState] = useState(
     post?.content
       ? EditorState.createWithContent(convertFromRaw(JSON.parse(post.content)))
       : EditorState.createEmpty()
   );
 
-  const id = post.post_id;
-
   useEffect(() => {
-    if (!post) {
+    if (!id) {
       navigate('/Profile');
     }
-  }, [post, navigate]);
+  }, [id, navigate]);
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event, imageUrl = image, categoryValue = category, tagsValue = tags) => {
     event.preventDefault();
     const contentState = editorState.getCurrentContent();
     const content = JSON.stringify(convertToRaw(contentState));
@@ -32,7 +33,7 @@ export const useEditPost = () => {
     try {
       const response = await axios.put(
         `/posts/${id}`,
-        { title, content, image },
+        { title, content, image: imageUrl, category: categoryValue, tags: tagsValue },
         {
           headers: { 'Content-Type': 'application/json' },
         }
@@ -53,6 +54,10 @@ export const useEditPost = () => {
     setTitle,
     image,
     setImage,
+    category,
+    setCategory,
+    tags,
+    setTags,
     editorState,
     setEditorState,
     handleSubmit,

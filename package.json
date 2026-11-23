@@ -14,15 +14,19 @@
     "ag-grid-react": "^31.2.1",
     "aws-serverless-express": "^3.4.0",
     "axios": "^1.6.8",
+    "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.3",
+    "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.6",
     "date-fns": "^3.6.0",
+    "dompurify": "^3.5.0",
     "dotenv": "^16.4.5",
     "draft-js": "^0.11.7",
     "draft-js-export-html": "^1.4.1",
     "express-session": "^1.18.0",
     "immutable": "^3.8.2",
     "mdb-react-ui-kit": "^7.2.0",
+    "multer": "^2.5.0",
     "mysql": "^2.18.1",
     "node-fetch": "^3.3.2",
     "pg": "^8.13.3",
@@ -42,7 +46,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "node --watch --env-file=.env server"
+    "dev": "node --watch --env-file=.env server",
+    "dev:all": "concurrently -k -n api,web \"npm run dev\" \"npm start\"",
+    "db:migrate": "node db/migrate.js",
+    "ai:reindex": "node scripts/reindex-post-embeddings.js",
+    "test:api": "node --test tests/*.test.js"
   },
   "eslintConfig": {
     "extends": [
@@ -63,6 +71,7 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "concurrently": "^10.0.7"
   }
 }

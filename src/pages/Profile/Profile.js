@@ -7,12 +7,14 @@ import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 import { useUserData, usePosts } from '../../hooks/useProfileHooks';
 import { convertCommentFromJSONToHTML } from '../../utils/convertCommentFromJSONToHTML';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Profile = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
-  const username = sessionStorage.getItem('username'); 
+  const { user } = useAuth();
+  const username = user?.username;
   const navigate = useNavigate();
 
   const { userData } = useUserData(username);
@@ -21,7 +23,7 @@ const Profile = () => {
   const handleDelete = () => {
     axios.delete(`/posts/${postToDelete}`)
       .then(() => {
-        setPosts(posts.filter(post => post.id !== postToDelete));
+        setPosts(posts.filter(post => post.post_id !== postToDelete));
         setPostToDelete(null);
         setShowDeleteModal(false);
         setShowSuccessModal(true);
@@ -66,8 +68,8 @@ const Profile = () => {
             <div className="profile-picture">
               {userData[0].username ? userData[0].username.charAt(0).toUpperCase() : ''}
             </div>
-            <h2>{userData[0].name || ''}</h2>
-            <p className="username">@{userData[0].username || ''}</p>
+              <h2>{userData[0].name || ''}</h2>
+              <p className="username">@{userData[0].username || ''}</p>
           
           </div>
         ):(

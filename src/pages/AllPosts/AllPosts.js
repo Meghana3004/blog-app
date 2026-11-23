@@ -8,7 +8,7 @@ import PostCard from '../../components/PostCard/PostCard.js';
 import { useAllPosts } from '../../hooks/useAllPostsHooks';
 
 const AllPosts = () => {
-  const { state, setState, searchPosts } = useAllPosts();
+  const { state, setState, searchPosts, clearFilters, setFilter } = useAllPosts();
   const navigate = useNavigate();
 
   const handleYearClick = (year) => {
@@ -34,7 +34,7 @@ const AllPosts = () => {
   };
 
   const handleShowAllPosts = () => {
-    setState(prevState => ({ ...prevState, searchResults: prevState.originalData }));
+    clearFilters();
   };
 
   const toggleContent = (post) => {
@@ -69,12 +69,38 @@ const AllPosts = () => {
               className="me-2 rounded-pill"
               aria-label="Search"
               value={state.searchTerm}
-              onChange={(e) => setState({ ...state, searchTerm: e.target.value })}
+              onChange={(e) => setState(prevState => ({ ...prevState, searchTerm: e.target.value }))}
             />
             <Button type="submit" className="rounded-pill btn-green" variant="secondary">
               Search
             </Button>
           </Form>
+          <Row className="g-2 mb-4">
+            <Col sm={6}>
+              <Form.Select
+                aria-label="Filter by category"
+                value={state.categoryFilter}
+                onChange={(e) => setFilter('categoryFilter', e.target.value)}
+              >
+                <option value="">All categories</option>
+                {state.categories.map((category) => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </Form.Select>
+            </Col>
+            <Col sm={6}>
+              <Form.Select
+                aria-label="Filter by tag"
+                value={state.tagFilter}
+                onChange={(e) => setFilter('tagFilter', e.target.value)}
+              >
+                <option value="">All tags</option>
+                {state.tags.map((tag) => (
+                  <option key={tag} value={tag}>{tag}</option>
+                ))}
+              </Form.Select>
+            </Col>
+          </Row>
 
           <div className="content-container">
             {state.searchResults.length > 0 ? (
@@ -102,9 +128,9 @@ const AllPosts = () => {
             <Pagination.Last onClick={() => handlePageChange(null, state.totalPages)} />
           </Pagination>
 
-          {state.searchResults.length > 0 && state.searchResults.length !== state.originalData.length && (
+          {(state.appliedSearchTerm || state.categoryFilter || state.tagFilter) && (
             <Button className="mt-3 button-spacing rounded-pill" variant="outline-dark" onClick={handleShowAllPosts}>
-              Show All Posts
+              Clear filters
             </Button>
           )}
 

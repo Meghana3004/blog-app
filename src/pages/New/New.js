@@ -10,6 +10,10 @@ function New() {
     setTitle,
     image,
     setImage,
+    category,
+    setCategory,
+    tags,
+    setTags,
     editorState,
     setEditorState,
     handleSubmit,
@@ -26,6 +30,10 @@ function New() {
           setTitle={setTitle}
           image={image}
           setImage={setImage}
+          category={category}
+          setCategory={setCategory}
+          tags={tags}
+          setTags={setTags}
           editorState={editorState}
           setEditorState={setEditorState}
           handleSubmit={handleSubmit}

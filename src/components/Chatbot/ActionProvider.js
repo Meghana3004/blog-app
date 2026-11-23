@@ -1,77 +1,39 @@
 import React from 'react';
-import { createCustomMessage } from 'react-chatbot-kit';
+import axios from 'axios';
 
 const ActionProvider = ({ createChatBotMessage, setState, children }) => {
-  const handleHello = () => {
-    const getCurrentTime = () => {
-      const timeString = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      return timeString;
-    };
+  const handleQuestion = async (question) => {
+    setState((previous) => ({
+      ...previous,
+      messages: [...previous.messages, createChatBotMessage('Searching the blog posts...')],
+    }));
 
-    const timestamp = getCurrentTime();
-    const botMessage = createChatBotMessage('Where would you like to explore today?', 
-    {
-      widget: 'Options',
-      payload: timestamp,
+    try {
+      const response = await axios.post('/assistant/ask', { query: question });
+      const sources = response.data.sources || [];
+      const sourceText = sources.length
+        ? `\n\nSources: ${sources.map((source) => source.title).join('; ')}`
+        : '';
+      setState((previous) => ({
+        ...previous,
+        messages: [...previous.messages, createChatBotMessage(`${response.data.answer}${sourceText}`)],
+      }));
+    } catch (error) {
+      const message = error.response?.data?.message || 'The assistant could not answer right now.';
+      setState((previous) => ({
+        ...previous,
+        messages: [...previous.messages, createChatBotMessage(message)],
+      }));
     }
-    );
-
-    const newMessage = createCustomMessage('Test', 'custom', {
-      payload: timestamp,
-    });
-    
-    setState((prev) => ({
-      ...prev,
-      messages: [...prev.messages, newMessage, botMessage],
-    }));  
   };
-  
 
   return (
     <div>
-      {React.Children.map(children, (child) => {
-        return React.cloneElement(child, {
-          actions: {
-            handleHello,
-          },
-        });
-      })}
+      {React.Children.map(children, (child) => React.cloneElement(child, {
+        actions: { handleQuestion },
+      }))}
     </div>
   );
 };
 
 export default ActionProvider;
-
-
-
-
-// import React from 'react';
-
-// const ActionProvider = ({ createChatBotMessage, setState, children }) => {
-//   const handleResponse = (responseData) => {
-//     const botMessage = createChatBotMessage(responseData.answer);
-    
-//     setState((prev) => ({
-//       ...prev,
-//       messages: [...prev.messages, botMessage],
-//     }));
-//   };
-
-//   return (
-//     <div>
-//       {React.Children.map(children, (child) => {
-//         return React.cloneElement(child, {
-//           actions: {
-//             handleResponse,
-//           },
-//         });
-//       })}
-//     </div>
-//   );
-// };
-
-// export default ActionProvider;
-
-
-
-

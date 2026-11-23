@@ -5,18 +5,17 @@ import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import ThumbDownOutlinedIcon from '@mui/icons-material/ThumbDownOutlined';
 import IconButton from '@mui/material/IconButton';
+import { useAuth } from '../../contexts/AuthContext';
 
 const LikeDislike = ({ postId }) => {
   const [likedPosts, setLikedPosts] = useState([]);
   const [dislikedPosts, setDislikedPosts] = useState([]);
-  const [username, setUsername] = useState('');
+  const { user } = useAuth();
+  const username = user?.username;
 
   useEffect(() => {
     const fetchLikedDislikedPosts = async () => {
       try {
-        const username = sessionStorage.getItem('username'); 
-        setUsername(username);
-
         const response = await axios.get(`/users/${username}/likes`);
         const { likedPosts: fetchedLikedPosts, dislikedPosts: fetchedDislikedPosts } = response.data;
 
@@ -27,8 +26,10 @@ const LikeDislike = ({ postId }) => {
       }
     };
 
-    fetchLikedDislikedPosts();
-  },[]);
+    if (username) {
+      fetchLikedDislikedPosts();
+    }
+  }, [username]);
 
   const handleLike = async () => {
     try {
@@ -45,7 +46,7 @@ const LikeDislike = ({ postId }) => {
       setLikedPosts([...likedPosts, postId]);
 
       // Send a POST request to the backend
-      await axios.post(`/posts/${postId}/like`, { username, liked });
+      await axios.post(`/posts/${postId}/like`, { liked });
     } catch (err) {
       console.error('Error liking post:', err);
     }
@@ -62,7 +63,7 @@ const LikeDislike = ({ postId }) => {
 
       setDislikedPosts([...dislikedPosts, postId]);
 
-      await axios.post(`/posts/${postId}/like`, { username, liked });
+      await axios.post(`/posts/${postId}/like`, { liked });
     } catch (err) {
       console.error('Error disliking post:', err);
     }

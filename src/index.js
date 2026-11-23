@@ -14,7 +14,8 @@ import axios from 'axios';
 />
 
 
-axios.defaults.baseURL = 'http://localhost:3001/api';
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || '/api';
+axios.defaults.withCredentials = true;
 
 
 axios.interceptors.request.use(request => {

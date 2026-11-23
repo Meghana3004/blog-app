@@ -15,22 +15,19 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.js';
 import FullPostPage from './pages/FullPost/FullPostPage.js';
 import Profile from './pages/Profile/Profile.js';
 import EditPost from './pages/EditPage/EditPost.js';
+import { AuthProvider } from './contexts/AuthContext';
 
 
 const App = () => {
-  const isAuthenticated = () => {
-    const username = sessionStorage.getItem('username');
-    return username !== null && username !== undefined && username !== '';
-  };
-
   return (
-    <Router>
-      <div>
+    <AuthProvider>
+      <Router>
+        <div>
         <Routes>
           <Route
             path="/Home"
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
               <NavbarExample />
               <CarouselExample />
               <Home />
@@ -42,7 +39,7 @@ const App = () => {
           <Route
             path="/AllPosts"
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
               <NavbarExample />
               <AllPosts />
               <ChatbotWidget />
@@ -52,7 +49,7 @@ const App = () => {
           <Route 
             path="/:index"  
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
               <NavbarExample />
               <FullPostPage />
               <ChatbotWidget />
@@ -62,7 +59,7 @@ const App = () => {
           <Route
             path="/New"
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
               <NavbarExample />
               <New />
               <ChatbotWidget />
@@ -73,7 +70,7 @@ const App = () => {
           <Route
             path="/Profile"
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
               <NavbarExample />
               <Profile />
               <ChatbotWidget />
@@ -84,7 +81,7 @@ const App = () => {
           <Route 
             path="/EditPost" 
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
               <NavbarExample />
               <EditPost />
               <ChatbotWidget />
@@ -95,7 +92,7 @@ const App = () => {
           {/* <Route
             path="/Archive"
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
               <NavbarExample />
               <ArchiveAGGrid />
               <ChatbotWidget />
@@ -105,7 +102,7 @@ const App = () => {
           {/* <Route
             path="/Documentation"
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute>
               <NavbarExample />
               <Documentation />
               <ChatbotWidget />
@@ -126,8 +123,9 @@ const App = () => {
             </>}
           />
         </Routes>
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 };
 
