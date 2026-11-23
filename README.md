@@ -10,7 +10,7 @@ image uploads, and a retrieval-augmented assistant grounded in published posts.
 - Category and tag filtering with server-side pagination and search.
 - Local image uploads (JPEG, PNG, GIF, or WebP; maximum 5 MB per file).
 - Local RAG assistant using Ollama chat and embedding models, PostgreSQL `pgvector` cosine similarity, and cited post sources.
-- Deterministic rule-based responses for greetings and assistant help.
+- Deterministic responses for greetings, thanks, and assistant help; general questions are answered separately from blog-grounded queries.
 
 ## Local setup
 
@@ -35,13 +35,15 @@ Requirements: Node.js 20+, PostgreSQL with pgvector, and Ollama for local AI inf
    ollama pull nomic-embed-text
    ```
 
+   `gemma:2b` keeps the download small. For a stronger 2024-era chat model, optionally run `ollama pull llama3.1:8b` (about 4.9 GB), then set `OLLAMA_CHAT_MODEL=llama3.1:8b` in `.env` and restart the API. Keep `nomic-embed-text` for embeddings.
+
 6. Rebuild embeddings for existing posts:
 
    ```powershell
    npm run ai:reindex
    ```
 
-   Ollama must be running locally. New and edited posts are queued for background indexing while the API is running. The basic greeting/help responses do not need Ollama.
+   Ollama must be running locally. New and edited posts are queued for background indexing while the API is running. Greeting, thanks, and help responses do not need Ollama.
 7. Start the API and UI together:
 
    ```powershell
@@ -67,8 +69,18 @@ Use durable object storage before deploying to an ephemeral filesystem.
 ```powershell
 npm test -- --watchAll=false
 npm run test:api
+npm run ai:evaluate
 npm run build
 ```
+
+`npm run ai:evaluate` runs the small labeled question set in `scripts/rag-evaluation.json`
+against the local Ollama models and current database. It reports intent/mode accuracy,
+blog retrieval Hit@1, response latency, and an optional expected-keyword smoke check.
+These results describe only this test set; keyword checks are not proof of factuality.
+For interviews, discuss how you would grow the set with held-out questions and human
+relevance/factuality judgments rather than presenting the demo-set score as universal accuracy.
+The current retrieval settings use one source (`top_k=1`), a cosine-similarity threshold
+of `0.55`, 768-dimensional Nomic embeddings, and temperature `0.2`.
 
 ## Resume draft
 

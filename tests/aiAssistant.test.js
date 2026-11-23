@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 const {
   answerQuestion,
+  classifyQuestion,
   contentToText,
   getRuleBasedAnswer,
 } = require('../services/aiAssistant');
@@ -18,6 +19,70 @@ test('extracts readable text from Draft.js post content', () => {
 test('uses a deterministic response for greetings', () => {
   assert.match(getRuleBasedAnswer('Hello!'), /Ask me a question/);
   assert.equal(getRuleBasedAnswer('Where is the post about Paris?'), null);
+  assert.match(getRuleBasedAnswer('Thanks!'), /You're welcome/);
+  assert.equal(classifyQuestion('Thanks!'), 'rule-based');
+});
+
+test('routes explicit blog questions and general knowledge questions separately', () => {
+  assert.equal(classifyQuestion('What does the Paris post recommend?'), 'blog');
+  assert.equal(classifyQuestion('What is photosynthesis?'), 'general');
+  assert.equal(classifyQuestion('Tell me about Paris'), 'auto');
+});
+
+test('answers general questions without embedding or retrieving blog posts', async () => {
+  const originalFetch = global.fetch;
+  const originalQuery = db.query;
+  const requests = [];
+  global.fetch = async (url, options) => {
+    requests.push({ url, body: JSON.parse(options.body) });
+    return {
+      ok: true,
+      statusText: 'OK',
+      json: async () => ({ message: { content: 'Photosynthesis is how plants convert light into chemical energy.' } }),
+    };
+  };
+  db.query = async () => {
+    throw new Error('General questions must not search blog posts');
+  };
+
+  try {
+    const result = await answerQuestion('What is photosynthesis?');
+    assert.equal(result.mode, 'general');
+    assert.deepEqual(result.sources, []);
+    assert.equal(requests.length, 1);
+    assert.equal(requests[0].url.endsWith('/api/chat'), true);
+  } finally {
+    global.fetch = originalFetch;
+    db.query = originalQuery;
+  }
+});
+
+test('routes ambiguous low-similarity questions to general chat', async () => {
+  const originalFetch = global.fetch;
+  const originalQuery = db.query;
+  const requests = [];
+  global.fetch = async (url, options) => {
+    requests.push(url);
+    const body = url.endsWith('/api/embed')
+      ? { embeddings: [Array(768).fill(0.1)] }
+      : { message: { content: 'Photosynthesis is how plants use light to make food.' } };
+    return { ok: true, statusText: 'OK', json: async () => body };
+  };
+  db.query = async () => ({
+    rows: [{ post_id: 8, title: 'A trip to Tokyo', content: 'Tokyo is in Japan.', similarity: '0.3' }],
+  });
+
+  try {
+    const result = await answerQuestion('Tell me about photosynthesis');
+    assert.equal(result.mode, 'general');
+    assert.deepEqual(result.sources, []);
+    assert.equal(requests.length, 2);
+    assert.equal(requests[0].endsWith('/api/embed'), true);
+    assert.equal(requests[1].endsWith('/api/chat'), true);
+  } finally {
+    global.fetch = originalFetch;
+    db.query = originalQuery;
+  }
 });
 
 test('answers blog questions with local Ollama embeddings and chat', async () => {
@@ -36,17 +101,17 @@ test('answers blog questions with local Ollama embeddings and chat', async () =>
   db.query = async (_sql, values) => {
     retrievalLimit = values[1];
     return {
-    rows: [{
-      post_id: 7,
-      title: 'A trip to Paris',
-      content: 'Paris is the capital.',
-      similarity: '0.9',
-    }, {
-      post_id: 8,
-      title: 'A trip to Tokyo',
-      content: 'Tokyo is in Japan.',
-      similarity: '0.5',
-    }],
+      rows: [{
+        post_id: 7,
+        title: 'A trip to Paris',
+        content: 'Paris is the capital.',
+        similarity: '0.9',
+      }, {
+        post_id: 8,
+        title: 'A trip to Tokyo',
+        content: 'Tokyo is in Japan.',
+        similarity: '0.5',
+      }],
     };
   };
 
@@ -67,7 +132,7 @@ test('answers blog questions with local Ollama embeddings and chat', async () =>
   }
 });
 
-test('declines weak retrieval matches instead of sending unrelated context to chat', async () => {
+test('declines explicit blog questions when no post is relevant', async () => {
   const originalFetch = global.fetch;
   const originalQuery = db.query;
   let chatRequested = false;
@@ -92,7 +157,7 @@ test('declines weak retrieval matches instead of sending unrelated context to ch
   });
 
   try {
-    const result = await answerQuestion('How do I repair a bicycle?');
+    const result = await answerQuestion('What does the blog say about bicycle repair?');
     assert.equal(result.sources.length, 0);
     assert.match(result.answer, /could not find a relevant post/i);
     assert.equal(chatRequested, false);

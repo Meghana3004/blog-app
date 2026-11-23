@@ -50,6 +50,7 @@
     "dev:all": "concurrently -k -n api,web \"npm run dev\" \"npm start\"",
     "db:migrate": "node db/migrate.js",
     "ai:reindex": "node scripts/reindex-post-embeddings.js",
+    "ai:evaluate": "node scripts/evaluate-rag.js",
     "test:api": "node --test tests/*.test.js"
   },
   "eslintConfig": {

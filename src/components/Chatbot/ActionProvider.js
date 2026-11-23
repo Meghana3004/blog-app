@@ -5,7 +5,7 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
   const handleQuestion = async (question) => {
     setState((previous) => ({
       ...previous,
-      messages: [...previous.messages, createChatBotMessage('Searching the blog posts...')],
+      messages: [...previous.messages, createChatBotMessage('Thinking...')],
     }));
 
     try {

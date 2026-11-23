@@ -1,0 +1,53 @@
+[
+  {
+    "query": "In the Paris blog post, which neighborhood is perched atop a hill?",
+    "expectedMode": "retrieval",
+    "expectedPostId": 1,
+    "mustIncludeAny": ["Montmartre"]
+  },
+  {
+    "query": "What attractions does the Paris post recommend?",
+    "expectedMode": "retrieval",
+    "expectedPostId": 1
+  },
+  {
+    "query": "Tell me about hidden gems in Tokyo",
+    "expectedMode": "retrieval",
+    "expectedPostId": 3
+  },
+  {
+    "query": "What does the Bali post say about finding a peaceful retreat?",
+    "expectedMode": "retrieval",
+    "expectedPostId": 4
+  },
+  {
+    "query": "What safari experiences are described in the Maasai Mara post?",
+    "expectedMode": "retrieval",
+    "expectedPostId": 2
+  },
+  {
+    "query": "What adventures are described in the Himalayas post?",
+    "expectedMode": "retrieval",
+    "expectedPostId": 5
+  },
+  {
+    "query": "What is photosynthesis?",
+    "expectedMode": "general"
+  },
+  {
+    "query": "How do I boil an egg?",
+    "expectedMode": "general"
+  },
+  {
+    "query": "What is the capital of Japan?",
+    "expectedMode": "general"
+  },
+  {
+    "query": "Thanks!",
+    "expectedMode": "rule-based"
+  },
+  {
+    "query": "Hello!",
+    "expectedMode": "rule-based"
+  }
+]
